@@ -1,7 +1,8 @@
-import { BrowserWindow, app } from 'electron'
-import { writeFileSync, readFileSync } from 'fs'
-import { join } from 'path'
-import { http } from './server'
+const { BrowserWindow, app } = require('electron')
+const { writeFileSync, readFileSync } = require('fs')
+const { join } = require('path')
+const { http } = require('./server')
+
 const port = 3000
 let win
 

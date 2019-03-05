@@ -5,7 +5,7 @@
   left: 0
   width: 100%
   height: calc(100% - 26px)
-  background-color: #00497d
+  background-color: #4f5b62
   cursor: initial
   z-index: 1000
   padding: 10px
@@ -41,7 +41,7 @@
     .fieldZone
       label.label(for="sound") Sound
       input#sound.input(v-model="sound" placeholder="Url to mp3")
-    btn(:action="save" v-if="sound !== ''").green Save
+    btn(:action="save" v-if="sound !== ''").blue Save
     btn(:action="cancel") Cancel
     btn(:action="del" v-if="!isNew").red Delete
 </template>

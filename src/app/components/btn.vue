@@ -14,10 +14,10 @@
   background-color: #909090
   &:hover
     background-color: darken(#909090, 10%)
-  &.green
-    background-color: green
+  &.blue
+    background-color: #4f83cc
     &:hover
-      background-color: darken(green, 10%)
+      background-color: darken(#4f83cc, 10%)
   &.red
     background-color: #ff7158
     &:hover

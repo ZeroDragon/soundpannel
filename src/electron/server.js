@@ -1,12 +1,12 @@
-import express from 'express'
-import Http from 'http'
-import cors from 'cors'
-import socketIO from 'socket.io'
-import { join } from 'path'
-import { readFileSync, writeFileSync } from 'fs'
+const express = require('express')
+const Http = require('http')
+const cors = require('cors')
+const socketIO = require('socket.io')
+const { join } = require('path')
+const { readFileSync, writeFileSync } = require('fs')
 
 const expressApp = express()
-export const http = Http.Server(expressApp)
+const http = Http.Server(expressApp)
 const io = socketIO(http)
 
 io.origins('*:*')
@@ -36,3 +36,5 @@ io.on('connection', socket => {
     io.emit('userClicked', data)
   })
 })
+
+exports.http = http

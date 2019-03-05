@@ -1,15 +1,16 @@
 <style lang="sass" scoped>
 .appSection
   display: flex
+  flex-direction: column
   height: calc(100% - 26px)
   .buttons, .config
     padding: 6px
   .buttons
-    width: 100%
+    height: 100%
     overflow: auto
   .config
-    width: 250px
-    border-left: 1px dashed rgba(#fff, 0.4)
+    border-top: 1px dashed rgba(#fff, 0.4)
+    text-align: center
 </style>
 
 <template lang="pug">
@@ -31,11 +32,13 @@
           @update="changeButton"
           v-if="agent === 'server'"
         )
-      .config(v-if="agent === 'server'")
+      .config(v-if="agent=== 'server'")
+        |Open this url in your smartphone: {{serverUrl}}
 </template>
 
 <script>
 import io from 'socket.io-client'
+import { getUserIP } from '../ipFinder'
 import appHeader from './header.vue'
 import soundButton from './soundButton.vue'
 
@@ -43,11 +46,13 @@ export default {
   data: () => ({
     buttons: [],
     agent: 'client',
-    socket: io('http://192.168.0.102:3000')
+    serverUrl: window.location.href,
+    socket: null
   }),
   methods: {
     async loadFromMemory () {
-      const response = await window.fetch('http://192.168.0.102:3000/buttons.json')
+      this.socket = io(this.serverUrl)
+      const response = await window.fetch(`${this.serverUrl}buttons.json`)
       const json = await response.json()
       this.buttons = json.map((itm, index) => {
         itm.key = index + 1
@@ -55,7 +60,7 @@ export default {
       })
     },
     async saveToMemory () {
-      const response = await window.fetch('http://192.168.0.102:3000/buttons.json', {
+      const response = await window.fetch(`${this.serverUrl}buttons.json`, {
         method: 'POST',
         headers: {
           'Content-type': 'application/json'
@@ -63,7 +68,6 @@ export default {
         body: JSON.stringify(this.buttons)
       })
       const json = await response.json()
-      console.log(json)
     },
     del (button) {
       this.buttons = this.buttons.filter(btn => {
@@ -104,7 +108,14 @@ export default {
     if (agent.indexOf('electron') !== -1) {
       this.agent = 'server'
     }
-    this.loadFromMemory()
+    if (this.agent === 'server') {
+      getUserIP(ip => {
+        this.serverUrl = `http://${ip}:3000/`
+        this.loadFromMemory()
+      })
+    } else {
+      this.loadFromMemory()
+    }
   }
 }
 </script>
