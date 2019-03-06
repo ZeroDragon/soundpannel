@@ -8,6 +8,20 @@
   .buttons
     height: 100%
     overflow: auto
+  .dropZone
+    height: 100px
+    width: 20px
+    display: inline-block
+    margin: 10px -10px
+    vertical-align: top
+    color: #000
+    position: relative
+    z-index: 9999
+    .drop
+      position: absolute
+      width: 120px
+      height: 100px
+      left: -50px
   .config
     border-top: 1px dashed rgba(#fff, 0.4)
     text-align: center
@@ -18,15 +32,27 @@
     appHeader
     .appSection
       .buttons
-        soundButton(
-          v-for="button in buttons"
-          :key="button.key"
-          :button="button"
-          :agent="agent"
-          :socket="socket"
-          @update="changeButton"
-          @del="del"
-        )
+        .dropZone(v-if="isVisible(-1)")
+          .drop(
+            @dragover.prevent="dragover"
+            @drop.prevent="drop(0)"
+          )
+        template(v-for="(button, k) in buttons")
+          soundButton(
+            :key="button.key"
+            :button="button"
+            :agent="agent"
+            :socket="socket"
+            @update="changeButton"
+            @del="del"
+            @dragstart="dragstart"
+            @dragend="dragend"
+          )
+          .dropZone(v-if="isVisible(k)")
+            .drop(
+              @dragover.prevent="dragover"
+              @drop.prevent="drop(k + 1)"
+            )
         soundButton(
           :isNew="true"
           @update="changeButton"
@@ -47,9 +73,42 @@ export default {
     buttons: [],
     agent: 'client',
     serverUrl: window.location.href,
-    socket: null
+    socket: null,
+    draggingItem: null
   }),
   methods: {
+    isVisible (index) {
+      if (!this.draggingItem) return false
+      const itemIndex = this.buttons
+        .map((item,k) => {
+          if (item.sound === this.draggingItem.sound) return k
+          return false
+        })
+        .find(item => item !== false)
+      console.log({index, itemIndex})
+      if (index === itemIndex) return false
+      if (index + 1 === itemIndex) return false
+      return true
+    },
+    dragstart (item) {
+      this.draggingItem = item
+    },
+    dragend () {
+      this.draggingItem = null
+    },
+    dragover () {},
+    drop (index) {
+      const itm = JSON.parse(JSON.stringify(this.draggingItem))
+      this.buttons = this.buttons
+        .map(bt => {
+          bt.toDelete = false
+          if (bt.sound !== itm.sound) return bt
+          bt.toDelete = true
+          return bt
+        })
+      this.buttons.splice(index, 0, itm)
+      this.buttons = this.buttons.filter(bt => !bt.toDelete)
+    },
     async loadFromMemory () {
       this.socket = io(this.serverUrl)
       const response = await window.fetch(`${this.serverUrl}buttons.json`)

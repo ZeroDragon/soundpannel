@@ -12,5 +12,5 @@
 
 <template lang="pug">
   .header
-    .title Soundboard
+    .title Sound Pannel
 </template>

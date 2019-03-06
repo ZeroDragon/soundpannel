@@ -42,7 +42,12 @@
       background-repeat: no-repeat
 </style>
 <template lang="pug">
-  .soundButton(:class="isNew ? 'isNew': ''")
+  .soundButton(
+    :class="isNew ? 'isNew': ''"
+    draggable="true"
+    @dragstart="$emit('dragstart', button)"
+    @dragend="$emit('dragend')"
+  )
     template(v-if="normal")
       template(v-if="isNew")
         .addIcon(@click="options") +
@@ -78,6 +83,9 @@ export default {
     }
   }),
   methods: {
+    drag (evt) {
+      console.log('dragstart', evt)
+    },
     loadData () {
       this.audio = null
       this.audio = new Audio(this.button.sound)

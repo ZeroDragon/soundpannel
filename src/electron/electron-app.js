@@ -1,4 +1,4 @@
-const { BrowserWindow, app } = require('electron')
+const { BrowserWindow, app, Menu } = require('electron')
 const { writeFileSync, readFileSync } = require('fs')
 const { join } = require('path')
 const { http } = require('./server')
@@ -35,6 +35,23 @@ const createWindow = () => {
   win.on('closed', () => {
     win = null
   })
+
+  const template = [{
+    label: 'Sound Pannel',
+    submenu: [
+      { label: 'Quit', accelerator: 'Command+Q', click: function () { app.quit() } }
+    ]
+  }, {
+    label: 'Edit',
+    submenu: [
+      { label: 'Cut', accelerator: 'CmdOrCtrl+X', selector: 'cut:' },
+      { label: 'Copy', accelerator: 'CmdOrCtrl+C', selector: 'copy:' },
+      { label: 'Paste', accelerator: 'CmdOrCtrl+V', selector: 'paste:' },
+      { label: 'Select all', accelerator: 'CmdOrCtrl+A', selector: 'selectAll:' }
+    ]
+  }]
+
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template))
 }
 
 app.on('ready', () => {
@@ -44,10 +61,9 @@ app.on('ready', () => {
 })
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
+  app.quit()
 })
+
 app.on('activate', () => {
   if (win === null) {
     createWindow()
