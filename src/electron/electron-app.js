@@ -36,21 +36,26 @@ const createWindow = () => {
     win = null
   })
 
-  const template = [{
-    label: 'Sound Pannel',
-    submenu: [
-      { label: 'Quit', accelerator: 'Command+Q', click: function () { app.quit() } }
-    ]
-  }, {
-    label: 'Edit',
-    submenu: [
-      { label: 'Cut', accelerator: 'CmdOrCtrl+X', selector: 'cut:' },
-      { label: 'Copy', accelerator: 'CmdOrCtrl+C', selector: 'copy:' },
-      { label: 'Paste', accelerator: 'CmdOrCtrl+V', selector: 'paste:' },
-      { label: 'Select all', accelerator: 'CmdOrCtrl+A', selector: 'selectAll:' }
-    ]
-  }]
-
+  const template = [
+    {
+      label: 'Sound Pannel',
+      submenu: [
+        { label: 'Cut', accelerator: 'CmdOrCtrl+X', selector: 'cut:' },
+        { label: 'Copy', accelerator: 'CmdOrCtrl+C', selector: 'copy:' },
+        { label: 'Paste', accelerator: 'CmdOrCtrl+V', selector: 'paste:' },
+        { label: 'Select all', accelerator: 'CmdOrCtrl+A', selector: 'selectAll:' },
+        {
+          label: 'Reload',
+          accelerator: 'CmdOrCtrl+R',
+          click (item, focusedWindow) {
+            if (focusedWindow) focusedWindow.reload()
+          }
+        },
+        { type: 'separator' },
+        { label: 'Quit', accelerator: 'CmdOrCtrl+Q', click: function () { app.quit() } }
+      ]
+    }
+  ]
   Menu.setApplicationMenu(Menu.buildFromTemplate(template))
 }
 

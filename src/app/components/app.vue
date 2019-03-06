@@ -1,4 +1,7 @@
 <style lang="sass" scoped>
+.mainApp
+  position: relative
+  overflow: hidden
 .appSection
   display: flex
   flex-direction: column
@@ -60,6 +63,7 @@
         )
       .config(v-if="agent=== 'server'")
         |Open this url in your smartphone: {{serverUrl}}
+    help
 </template>
 
 <script>
@@ -67,6 +71,7 @@ import io from 'socket.io-client'
 import { getUserIP } from '../ipFinder'
 import appHeader from './header.vue'
 import soundButton from './soundButton.vue'
+import help from './help.vue'
 
 export default {
   data: () => ({
@@ -158,10 +163,6 @@ export default {
       this.saveToMemory()
     }
   },
-  components: {
-    appHeader,
-    soundButton
-  },
   beforeMount () {
     const agent = navigator.userAgent.toLowerCase()
     if (agent.indexOf('electron') !== -1) {
@@ -175,7 +176,11 @@ export default {
     } else {
       this.loadFromMemory()
     }
+  },
+  components: {
+    appHeader,
+    soundButton,
+    help
   }
 }
 </script>
-
