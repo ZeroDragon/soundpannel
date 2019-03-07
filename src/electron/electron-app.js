@@ -7,10 +7,11 @@ const port = 3000
 let win
 
 const createWindow = () => {
-  let electronSettings = readFileSync(
-    join(__dirname, './electron-settings.json')
-  )
+  let electronSettings
   try {
+    electronSettings = readFileSync(
+      join(__dirname, './electron-settings.json')
+    )
     electronSettings = JSON.parse(electronSettings)
   } catch (_error) {
     electronSettings = {}
@@ -56,7 +57,7 @@ const createWindow = () => {
       ]
     }
   ]
-  Menu.setApplicationMenu(Menu.buildFromTemplate(template))
+  // Menu.setApplicationMenu(Menu.buildFromTemplate(template))
 }
 
 app.on('ready', () => {

@@ -32,6 +32,7 @@
       bottom: 6px
       left: 0
       width: 100%
+      background-color: rgba(#000, 0.7)
     .image
       width: 100%
       height: 100%
@@ -44,7 +45,7 @@
 <template lang="pug">
   .soundButton(
     :class="isNew ? 'isNew': ''"
-    draggable="true"
+    :draggable="isNormal"
     @dragstart="$emit('dragstart', button)"
     @dragend="$emit('dragend')"
   )
@@ -79,19 +80,24 @@ export default {
     shadow: {
       image: null,
       text: null,
-      sound: null
+      sound: null,
+      volume: null
     }
   }),
+  computed: {
+    isNormal () {
+      return this.normal
+    }
+  },
   methods: {
-    drag (evt) {
-      console.log('dragstart', evt)
-    },
     loadData () {
       this.audio = null
       this.audio = new Audio(this.button.sound)
+      this.audio.volume = this.button.volume
       this.shadow.image = this.button.image
       this.shadow.text = this.button.text
       this.shadow.sound = this.button.sound
+      this.shadow.volume = this.button.volume
     },
     update (newVals) {
       this.$emit('update', {shadow: newVals, button: this.button})

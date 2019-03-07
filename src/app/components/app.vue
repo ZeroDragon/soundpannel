@@ -90,7 +90,6 @@ export default {
           return false
         })
         .find(item => item !== false)
-      console.log({index, itemIndex})
       if (index === itemIndex) return false
       if (index + 1 === itemIndex) return false
       return true
@@ -113,6 +112,7 @@ export default {
         })
       this.buttons.splice(index, 0, itm)
       this.buttons = this.buttons.filter(bt => !bt.toDelete)
+      this.saveToMemory()
     },
     async loadFromMemory () {
       this.socket = io(this.serverUrl)
@@ -144,6 +144,7 @@ export default {
         sound: data.sound,
         text: data.text,
         image: data.image,
+        volume: data.volume,
         key: this.buttons.length + 1
       }
       this.buttons.push(btn)
@@ -158,6 +159,7 @@ export default {
       btn.sound = shadow.sound
       btn.text = shadow.text
       btn.image = shadow.image
+      btn.volume = shadow.volume
       btn.key = Math.round((Math.random() * 1000) * (Math.random() * 1000))
       btn.key = button.key
       this.saveToMemory()
