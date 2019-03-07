@@ -10,7 +10,7 @@ const createWindow = () => {
   let electronSettings
   try {
     electronSettings = readFileSync(
-      join(__dirname, './electron-settings.json')
+      join(app.getPath('userData'), 'electron-settings.json')
     )
     electronSettings = JSON.parse(electronSettings)
   } catch (_error) {
@@ -30,7 +30,7 @@ const createWindow = () => {
   win.loadURL(`http://localhost:${port}/`)
   win.on('close', () => {
     const bounds = win.getBounds()
-    const settingsFile = join(__dirname, 'electron-settings.json')
+    const settingsFile = join(app.getPath('userData'), 'electron-settings.json')
     writeFileSync(settingsFile, JSON.stringify(bounds, false, 2))
   })
   win.on('closed', () => {
@@ -57,7 +57,7 @@ const createWindow = () => {
       ]
     }
   ]
-  // Menu.setApplicationMenu(Menu.buildFromTemplate(template))
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template))
 }
 
 app.on('ready', () => {
