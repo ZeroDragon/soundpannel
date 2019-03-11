@@ -1,10 +1,13 @@
-const { BrowserWindow, app, Menu } = require('electron')
+const { BrowserWindow, app, Menu, dialog } = require('electron')
 const { writeFileSync, readFileSync } = require('fs')
 const { join } = require('path')
+const { updater, checker } = require('./updater')
 const { http } = require('./server')
 
 const port = 3000
 let win
+let updating = false
+let updateDownloaded = false
 
 const createWindow = () => {
   let electronSettings
@@ -37,48 +40,102 @@ const createWindow = () => {
     win = null
   })
 
-  const template = [
+  const editMenu = [
+    { label: 'Cut', accelerator: 'CmdOrCtrl+X', selector: 'cut:' },
+    { label: 'Copy', accelerator: 'CmdOrCtrl+C', selector: 'copy:' },
+    { label: 'Paste', accelerator: 'CmdOrCtrl+V', selector: 'paste:' },
+    { label: 'Select all', accelerator: 'CmdOrCtrl+A', selector: 'selectAll:' },
+    {
+      label: 'Reload',
+      accelerator: 'CmdOrCtrl+R',
+      click (_item, focusedWindow) {
+        if (focusedWindow) focusedWindow.reload()
+      }
+    }
+  ]
+
+  if (process.env.ENV === 'development') {
+    editMenu.push(
+      {
+        label: 'Open dev tools',
+        accelerator: 'CmdOrCtrl+Alt+i',
+        click (_item, focusedWindow) {
+          focusedWindow.webContents.openDevTools()
+        }
+      }
+    )
+  }
+
+  const menu = [
     {
       label: 'Sound Pannel',
       submenu: [
-        { label: 'Cut', accelerator: 'CmdOrCtrl+X', selector: 'cut:' },
-        { label: 'Copy', accelerator: 'CmdOrCtrl+C', selector: 'copy:' },
-        { label: 'Paste', accelerator: 'CmdOrCtrl+V', selector: 'paste:' },
-        { label: 'Select all', accelerator: 'CmdOrCtrl+A', selector: 'selectAll:' },
-        {
-          label: 'Reload',
-          accelerator: 'CmdOrCtrl+R',
-          click (item, focusedWindow) {
-            if (focusedWindow) focusedWindow.reload()
-          }
-        },
+        { label: `Check for updates...`, click: function () { checkForUpdates() } },
         { type: 'separator' },
         { label: 'Quit', accelerator: 'CmdOrCtrl+Q', click: function () { app.quit() } }
       ]
+    },
+    {
+      label: 'Edit',
+      submenu: editMenu
     }
   ]
-  Menu.setApplicationMenu(Menu.buildFromTemplate(template))
-
-  // const dialogOpts = {
-  //   type: 'info',
-  //   buttons: ['Restart', 'Later'],
-  //   title: 'Application Update',
-  //   message: 'Sound Pannel',
-  //   detail: 'A new version has been downloaded. Restart the application to apply the updates.'
-  // }
-
-  // dialog.showMessageBox(dialogOpts, (response) => {
-  //   console.log(response)
-  // })
+  Menu.setApplicationMenu(Menu.buildFromTemplate(menu))
 }
 
-const checkUpdate = () => {
-
+const checkForUpdates = () => {
+  if (updating) {
+    dialog.showMessageBox({
+      type: 'info',
+      buttons: ['Close'],
+      title: `Sound Board`,
+      message: `Hang on a sec`,
+      detail: 'We are downloading the update...'
+    }, (response) => {})
+    return
+  }
+  checker((_error, hasUpdates) => {
+    if (hasUpdates) {
+      dialog.showMessageBox({
+        type: 'info',
+        buttons: ['Download update', 'Close'],
+        title: `Sound Board. Current version: ${app.getVersion()}`,
+        message: `There is a new version available. Do you want to start the download?`,
+        detail: 'Download will accur in the background'
+      }, (response) => {
+        console.log(response)
+        if (response === 0) {
+          updating = true
+          console.log({ updating })
+          updater(() => {
+            console.log('done')
+            updating = false
+            updateDownloaded = true
+          }, true)
+        }
+      })
+    } else if (updateDownloaded) {
+      dialog.showMessageBox({
+        type: 'info',
+        buttons: ['Close'],
+        title: 'Sound Board',
+        message: `Download finished`,
+        detail: 'The new version will be ready next time you run open this app'
+      }, () => { })
+    } else {
+      dialog.showMessageBox({
+        type: 'info',
+        buttons: ['Close'],
+        title: 'Sound Board',
+        message: `Success`,
+        detail: 'Your are running the latest version!'
+      }, () => { })
+    }
+  })
 }
 
 app.on('ready', () => {
   http.listen(port, () => {
-    checkUpdate()
     createWindow()
   })
 })

@@ -6,7 +6,7 @@
   "main": "./src/index.js",
   "scripts": {
     "webpack": "nodemon ./src/dev/build.js",
-    "electron": "electron .",
+    "electron": "ENV=development electron .",
     "build": "electron-packager . --overwrite --prune --out=release --icon=./dist/icons/source.icns"
   },
   "author": "Zero Dragon",
@@ -31,8 +31,11 @@
     "webpack": "^4.29.6"
   },
   "dependencies": {
+    "adm-zip": "^0.4.13",
     "cors": "^2.8.5",
     "express": "^4.16.4",
+    "fs-extra": "^7.0.1",
+    "request": "^2.88.0",
     "socket.io": "^2.2.0",
     "socket.io-client": "^2.2.0"
   }
