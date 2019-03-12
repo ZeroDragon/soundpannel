@@ -118,6 +118,7 @@ const checkForUpdates = () => {
           updater(() => {
             updating = false
             updateDownloaded = true
+            checkForUpdates()
           }, true)
         }
       })
