@@ -5,6 +5,8 @@ const cors = require('cors')
 const socketIO = require('socket.io')
 const { join } = require('path')
 const { readFileSync, writeFileSync } = require('fs')
+const request = require('request')
+const cheerio = require('cheerio')
 
 const expressApp = express()
 const http = Http.Server(expressApp)
@@ -31,6 +33,28 @@ expressApp.post('/buttons.json', (req, res) => {
   const path = join(app.getPath('userData'), 'buttons.json')
   writeFileSync(path, JSON.stringify(req.body, false, 2))
   res.json({ success: true })
+})
+
+expressApp.get('/search', (req, res) => {
+  const { q: search } = req.query
+  const myInstants = 'https://www.myinstants.com'
+  const url = `${myInstants}/search/?name=${search}`
+  request.get(url, (_err, _response, body) => {
+    const $ = cheerio.load(body)
+    const sounds = []
+    $('.instant').each(function (i, elem) {
+      const title = $(this)
+        .text()
+        .replace(/\n/g, '')
+      const link = $(this)
+        .children('.small-button')
+        .attr('onmousedown')
+        .replace(/play\('|'\)/g, '')
+      const item = { title, link: `${myInstants}${link}` }
+      sounds.push(item)
+    })
+    res.json({ success: true, sounds })
+  })
 })
 
 expressApp.get('/', (req, res) => {

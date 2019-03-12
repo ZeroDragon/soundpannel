@@ -12,12 +12,22 @@
   cursor: pointer
   color: #fff
   background-color: #909090
+  &.tiny
+    min-width: 0
+    font-size: 12px
+    padding: 2px 4px
+    margin: 0 2px
+    border-radius: 2px
   &:hover
     background-color: darken(#909090, 10%)
   &.blue
     background-color: #4f83cc
     &:hover
       background-color: darken(#4f83cc, 10%)
+  &.green
+    background-color: #4CAF50
+    &:hover
+      background-color: darken(#4CAF50, 10%)
   &.red
     background-color: #ff7158
     &:hover
@@ -33,7 +43,7 @@
 export default {
   props: {
     action: {
-      default: (() => {})
+      default: () => {}
     }
   }
 }

@@ -47,37 +47,74 @@
   vertical-align: top
   line-height: 29px
   margin-left: 10px
+.searcher
+  input
+    width: calc(100% - 120px)
+.crudSection
+  height: calc(100% - 50px)
+  display: flex
+  .column
+    width: 50%
+  .results
+    overflow: auto
+    max-height: calc(100% - 50px)
 </style>
 
 <template lang="pug">
   .crudButton
-    .fieldZone
-      label.label(for="text") Text
-      input#text.input(v-model="text" placeholder="Display text")
-    .fieldZone
-      label.label(for="image") Image
-      input#image.input(v-model="image" placeholder="URL to image")
-    .fieldZone
-      label.label(for="sound") Sound
-      input#sound.input(v-model="sound" placeholder="Url to mp3")
-    .fieldZone
-      label.label(for="volume") Volume
-      input#volume.slider(type="range" min="0" max="10" v-model="volume")
-      span.volumeInd {{volume}}
+    .crudSection
+      .column
+        .fieldZone
+          label.label(for="text") Text
+          input#text.input(v-model="text" placeholder="Display text")
+        .fieldZone
+          label.label(for="image") Image
+          input#image.input(v-model="image" placeholder="URL to image")
+        .fieldZone
+          label.label(for="sound") Sound
+          input#sound.input(v-model="sound" placeholder="Url to mp3")
+        .fieldZone
+          label.label(for="volume") Volume
+          input#volume.slider(type="range" min="0" max="10" v-model="volume")
+          span.volumeInd {{volume}}
+      .column
+        .fieldZone.searcher
+          label.label(for="text") Search for sfx
+          input#text.input(v-model="searchT" placeholder="its over 9000")
+          btn(:action="search").green Search
+        .results
+          resultsfx(
+            v-for="(sfx, i) in results"
+            :sfx="sfx"
+            @addsfx="addsfx"
+          )
     btn(:action="save" v-if="sound !== ''").blue Save
     btn(:action="cancel") Cancel
     btn(:action="del" v-if="!isNew").red Delete
 </template>
 <script>
 import btn from './btn.vue'
+import resultsfx from './resultsfx.vue'
 export default {
   data: () => ({
     image: '',
     text: '',
     sound: '',
-    volume: 10
+    searchT: '',
+    serverUrl: window.location.href,
+    volume: 10,
+    results: []
   }),
   methods: {
+    async search () {
+      const response = await window.fetch(`${this.serverUrl}search?q=${this.searchT}`)
+      const json = await response.json()
+      this.results = json.sounds
+    },
+    addsfx (sfx) {
+      this.text = sfx.title
+      this.sound = sfx.link
+    },
     cancel () {
       this.$emit('cancel')
     },
@@ -108,7 +145,8 @@ export default {
     }
   },
   components: {
-    btn
+    btn,
+    resultsfx
   }
 }
 </script>
