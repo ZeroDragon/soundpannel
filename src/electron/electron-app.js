@@ -94,6 +94,16 @@ const checkForUpdates = () => {
     }, (response) => {})
     return
   }
+  if (updateDownloaded) {
+    dialog.showMessageBox({
+      type: 'info',
+      buttons: ['Close'],
+      title: 'Sound Board',
+      message: `Download finished`,
+      detail: 'The new version will be ready next time you run open this app'
+    }, () => { })
+    return
+  }
   checker((_error, hasUpdates) => {
     if (hasUpdates) {
       dialog.showMessageBox({
@@ -103,25 +113,14 @@ const checkForUpdates = () => {
         message: `There is a new version available. Do you want to start the download?`,
         detail: 'Download will accur in the background'
       }, (response) => {
-        console.log(response)
         if (response === 0) {
           updating = true
-          console.log({ updating })
           updater(() => {
-            console.log('done')
             updating = false
             updateDownloaded = true
           }, true)
         }
       })
-    } else if (updateDownloaded) {
-      dialog.showMessageBox({
-        type: 'info',
-        buttons: ['Close'],
-        title: 'Sound Board',
-        message: `Download finished`,
-        detail: 'The new version will be ready next time you run open this app'
-      }, () => { })
     } else {
       dialog.showMessageBox({
         type: 'info',
