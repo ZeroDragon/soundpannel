@@ -35,7 +35,7 @@ const checker = (cb) => {
 }
 
 const updater = (cb, proceed) => {
-  const server = 'https://hazel-qwdqteu7k.now.sh/'
+  const server = 'https://soundpannel.now.sh/'
   const feed = `${server}update/${process.platform}/${app.getVersion()}`
   request({
     url: feed,
