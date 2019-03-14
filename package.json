@@ -7,7 +7,8 @@
   "scripts": {
     "webpack": "nodemon ./src/dev/build.js",
     "electron": "ENV=development electron .",
-    "build": "electron-packager . --overwrite --prune --out=release --icon=./dist/icons/source.icns"
+    "build": "electron-packager . --overwrite --prune --out=release --icon=./dist/icons/source.icns",
+    "package": "electron-installer-dmg release/Sound\\ Pannel-darwin-x64/Sound\\ Pannel.app Sound\\ Pannel --out=release --icon=dist/icons/source.png --title=Sound\\ Pannel --overwrite"
   },
   "author": "Zero Dragon",
   "license": "ISC",
@@ -19,6 +20,7 @@
     "acorn": "^6.1.1",
     "css-loader": "^2.1.0",
     "electron": "^4.0.6",
+    "electron-installer-dmg": "^2.0.0",
     "electron-packager": "^13.1.1",
     "node-sass": "^4.11.0",
     "pug": "^2.0.3",
