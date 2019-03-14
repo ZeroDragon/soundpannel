@@ -1,7 +1,7 @@
 {
   "name": "soundpannel",
   "productName": "Sound Pannel",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "SFX Sound pannel for your podcasts",
   "main": "./src/index.js",
   "scripts": {
