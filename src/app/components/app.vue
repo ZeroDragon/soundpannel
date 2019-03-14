@@ -77,7 +77,7 @@ export default {
   data: () => ({
     buttons: [],
     agent: 'client',
-    serverUrl: window.location.href,
+    serverUrl: `${window.location.origin}/`,
     socket: null,
     draggingItem: null
   }),
@@ -145,6 +145,7 @@ export default {
         text: data.text,
         image: data.image,
         volume: data.volume,
+        overlaySettings: data.overlaySettings,
         key: this.buttons.length + 1
       }
       this.buttons.push(btn)
@@ -160,6 +161,7 @@ export default {
       btn.text = shadow.text
       btn.image = shadow.image
       btn.volume = shadow.volume
+      btn.overlaySettings = shadow.overlaySettings
       btn.key = Math.round((Math.random() * 1000) * (Math.random() * 1000))
       btn.key = button.key
       this.saveToMemory()

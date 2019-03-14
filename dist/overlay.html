@@ -1,0 +1,87 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="/styles/styles-overlay.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.8/vue.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <title>Sound Pannel</title>
+  <style>
+    .app {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    .overlay {
+      position: absolute;
+      background: no-repeat center;
+      background-size: cover;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="app">
+    <div class="overlay" v-for="(over, k) in overlays" :key="k" :style="over.style"></div>
+  </div>
+</body>
+<script>
+  const vue = new Vue({
+    el: '#app',
+    data: {
+      curtain: { style: {}, displaying: false },
+      overlays: [],
+      socket: io('/'),
+    },
+    methods: {
+      setOverlay (settings) {
+        const existing = this.overlays.find(e => e.uuid === settings.uuid)
+        if (existing) {
+          clearTimeout(existing.ttl)
+          existing.selfDestruct()
+        } else {
+          const overlay = {
+            uuid: settings.uuid,
+            selfDestruct: () => {
+              Object.keys(settings.start).forEach(key => {
+                overlay.style[key] = settings.start[key]
+              })
+              const out = settings.animationOut || settings.animationIn
+              overlay.style.transition = `all linear ${out}ms`
+              setTimeout(() => {
+                this.overlays = this.overlays.filter(e => e.uuid !== overlay.uuid)
+              }, out)
+            },
+            style: {
+              backgroundImage: `url('${settings.image}')`,
+            }
+          }
+          if (settings.duration === '') settings.duration = 'infinite'
+          if (settings.duration !== 'infinite') {
+            const timeout = parseInt(settings.duration, 10) + parseInt(settings.animationIn, 10)
+            overlay.ttl = setTimeout(() => {
+              overlay.selfDestruct()
+            }, timeout)
+          }
+          Object.keys(settings.start).forEach(key => {
+            overlay.style[key] = settings.start[key]
+          })
+          overlay.style.transition = `all linear ${settings.animationIn}ms`
+          this.overlays.push(overlay)
+          setTimeout(() => {
+            if(!settings.finish) return
+            Object.keys(settings.finish).forEach(key => {
+              overlay.style[key] = settings.finish[key]
+            })
+          }, 50)
+        }
+      }
+    },
+    mounted () {
+      this.socket.on('toggleOverlay', data => {
+        this.setOverlay(data)
+      })
+    }
+  })
+</script>
+</html>

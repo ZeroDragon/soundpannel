@@ -63,38 +63,69 @@
 <template lang="pug">
   .crudButton
     .crudSection
-      .column
-        .fieldZone
-          label.label(for="text") Text
-          input#text.input(v-model="text" placeholder="Display text")
-        .fieldZone
-          label.label(for="image") Image
-          input#image.input(v-model="image" placeholder="URL to image")
-        .fieldZone
-          label.label(for="sound") Sound
-          input#sound.input(v-model="sound" placeholder="Url to mp3")
-        .fieldZone
-          label.label(for="volume") Volume
-          input#volume.slider(type="range" min="0" max="10" v-model="volume")
-          span.volumeInd {{volume}}
-      .column
-        .fieldZone.searcher
-          label.label(for="text") Search for sfx
-          input#text.input(v-model="searchT" placeholder="its over 9000")
-          btn(:action="search").green Search
-        .results
-          resultsfx(
-            v-for="(sfx, i) in results"
-            :sfx="sfx"
-            @addsfx="addsfx"
-          )
-    btn(:action="save" v-if="sound !== ''").blue Save
+      template(v-if="showAudio")
+        .column
+          .fieldZone
+            label.label(for="text") Text
+            input#text.input(v-model="text" placeholder="Display text")
+          .fieldZone
+            label.label(for="image") Image
+            input#image.input(v-model="image" placeholder="URL to image")
+          .fieldZone
+            label.label(for="sound") Sound
+            input#sound.input(v-model="sound" placeholder="Url to mp3")
+          .fieldZone
+            label.label(for="volume") Volume
+            input#volume.slider(type="range" min="0" max="10" v-model="volume")
+            span.volumeInd {{volume}}
+        .column
+          .fieldZone.searcher
+            label.label(for="search") Search for sfx
+            input#search.input(v-model="searchT" placeholder="its over 9000")
+            btn(:action="search").green Search
+          .results
+            resultsfx(
+              v-for="(sfx, i) in results"
+              :sfx="sfx"
+              @addsfx="addsfx"
+            )
+      template(v-else)
+        .column
+          .fieldZone
+            label.label(for="enableOl") Enable overlay
+            input#enableOl(type="checkbox" value="true" v-model="overlaySettings.enable")
+          .fieldZone
+            label.label(for="animationIn") Animation In
+            input#animationIn.input(v-model="overlaySettings.animationIn" placeholder="Time of enter animation")
+          .fieldZone
+            label.label(for="animationOut") Animation Out
+            input#animationOut.input(v-model="overlaySettings.animationOut" placeholder="Time of exit animation")
+          .fieldZone
+            label.label(for="duration") Duration
+            input#duration.input(v-model="overlaySettings.duration" placeholder="infinite")
+          .fieldZone
+            label.label(for="olImage") Overlay image
+            input#olImage.input(v-model="overlaySettings.image" placeholder="Url")
+        .column
+          .fieldZone
+            label.label Start state
+            stateEditor(v-model="overlaySettings.start")
+          .fieldZone
+            label.label Finish state
+            stateEditor(v-model="overlaySettings.finish")
+
+    btn.green(:action="() => {showAudio = !showAudio}")
+      template(v-if="showAudio") Overlay 
+      template(v-else) Audio 
+      | settings
+    btn(:action="save").blue Save
     btn(:action="cancel") Cancel
     btn(:action="del" v-if="!isNew").red Delete
 </template>
 <script>
 import btn from './btn.vue'
 import resultsfx from './resultsfx.vue'
+import stateEditor from './stateEditor.vue'
 export default {
   data: () => ({
     image: '',
@@ -102,7 +133,18 @@ export default {
     sound: '',
     searchT: '',
     serverUrl: window.location.href,
+    showAudio: true,
     volume: 10,
+    overlaySettings: {
+      uuid: null,
+      enable: false,
+      animationIn: 300,
+      animationOut: '',
+      duration: 'infinite',
+      image: '',
+      start: {},
+      finish: {}
+    },
     results: []
   }),
   methods: {
@@ -122,12 +164,13 @@ export default {
       this.$emit('del')
     },
     save () {
-      if (this.sound === '') return
+      this.overlaySettings.uuid = this.overlaySettings.image
       this.$emit('update', {
         image: this.image,
         text: this.text,
         sound: this.sound,
-        volume: this.volume / 10
+        volume: this.volume / 10,
+        overlaySettings: this.overlaySettings
       })
     }
   },
@@ -137,6 +180,7 @@ export default {
     this.text = this.value.text
     this.sound = this.value.sound
     this.volume = this.value.volume * 10
+    this.overlaySettings = JSON.parse(JSON.stringify(this.value.overlaySettings))
   },
   props: {
     value: {},
@@ -146,7 +190,8 @@ export default {
   },
   components: {
     btn,
-    resultsfx
+    resultsfx,
+    stateEditor
   }
 }
 </script>

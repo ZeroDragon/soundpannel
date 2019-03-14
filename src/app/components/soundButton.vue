@@ -81,7 +81,8 @@ export default {
       image: null,
       text: null,
       sound: null,
-      volume: null
+      volume: null,
+      overlaySettings: {}
     }
   }),
   computed: {
@@ -92,12 +93,28 @@ export default {
   methods: {
     loadData () {
       this.audio = null
-      this.audio = new Audio(this.button.sound)
-      this.audio.volume = this.button.volume
+      if (this.button.sound) {
+        this.audio = new Audio(this.button.sound)
+        this.audio.volume = this.button.volume
+        this.shadow.sound = this.button.sound
+        this.shadow.volume = this.button.volume
+      }
       this.shadow.image = this.button.image
       this.shadow.text = this.button.text
-      this.shadow.sound = this.button.sound
-      this.shadow.volume = this.button.volume
+      const defaultOverlaySettings = {
+        enable: false,
+        animationIn: null,
+        animationOut: null,
+        duration: null,
+        image: null,
+        start: {},
+        finish: {}
+      }
+      this.shadow.overlaySettings = JSON.parse(
+        JSON.stringify(
+          this.button.overlaySettings || defaultOverlaySettings
+        )
+      )
     },
     update (newVals) {
       this.$emit('update', {shadow: newVals, button: this.button})
@@ -112,12 +129,13 @@ export default {
     },
     playSound () {
       if (this.agent === 'server') {
-        if (this.audio.duration > 0 && !this.audio.paused) {
+        if (this.audio && this.audio.duration > 0 && !this.audio.paused) {
           this.audio.pause()
           this.audio.currentTime = 0
         } else {
-          this.audio.play()
+          if (this.audio) this.audio.play()
         }
+        this.socket.emit('triggerOvelay', { btn: this.button })
       } else {
         this.socket.emit('userClick', {uid: this.uid})
       }

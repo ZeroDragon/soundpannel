@@ -57,11 +57,19 @@ expressApp.get('/search', (req, res) => {
   })
 })
 
+expressApp.get('/overlay', (req, res) => {
+  res.sendFile(join(__dirname, '../../dist/overlay.html'))
+})
+
 expressApp.get('/', (req, res) => {
   res.sendFile(join(__dirname, '../../dist/index.html'))
 })
 
 io.on('connection', socket => {
+  socket.on('triggerOvelay', data => {
+    const overlaySettings = data.btn.overlaySettings
+    if (overlaySettings && overlaySettings.enable) io.emit('toggleOverlay', data.btn.overlaySettings)
+  })
   socket.on('userClick', data => {
     io.emit('userClicked', data)
   })
