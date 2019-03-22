@@ -7,7 +7,9 @@
   "scripts": {
     "webpack": "nodemon ./src/dev/build.js",
     "electron": "ENV=development electron .",
-    "build": "electron-packager . --overwrite --prune --out=release --icon=./dist/icons/source.icns",
+    "build-mac": "electron-packager . --overwrite --prune --out=release --icon=./dist/icons/source.icns",
+    "build-linux": "electron-packager . --overwrite --prune --out=release --icon=./dist/icons/source.png",
+    "build-win": "electron-packager . --platform=win32 --overwrite --prune --out=release --icon=./dist/icons/source.ico",
     "package": "electron-installer-dmg release/Sound\\ Pannel-darwin-x64/Sound\\ Pannel.app Sound\\ Pannel --out=release --icon=dist/icons/source.png --title=Sound\\ Pannel --overwrite"
   },
   "author": "Zero Dragon",
