@@ -25,9 +25,9 @@
     &:hover
       background-color: darken(#4f83cc, 10%)
   &.green
-    background-color: #4CAF50
+    background-color: darken(#4CAF50, 10%)
     &:hover
-      background-color: darken(#4CAF50, 10%)
+      background-color: darken(#4CAF50, 20%)
   &.red
     background-color: #ff7158
     &:hover

@@ -9,10 +9,13 @@
     cursor: pointer
     border: 1px solid #444
     background-color: #4f5b62
-    background-image: url('data:image/svg+xml;charset=utf8,<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 60 60" style="enable-background:new 0 0 60 60;" xml:space="preserve"><path d="M30,0C13.458,0,0,13.458,0,30s13.458,30,30,30s30-13.458,30-30S46.542,0,30,0z M45.563,30.826l-22,15 C23.394,45.941,23.197,46,23,46c-0.16,0-0.321-0.038-0.467-0.116C22.205,45.711,22,45.371,22,45V15c0-0.371,0.205-0.711,0.533-0.884 c0.328-0.174,0.724-0.15,1.031,0.058l22,15C45.836,29.36,46,29.669,46,30S45.836,30.64,45.563,30.826z"/></svg>')
-    background-size: 55%
-    background-repeat: no-repeat
-    background-position: center 10px
+    &:after
+      font-family: SoundPannel
+      content: '\ea1c'
+      font-size: 50px
+      display: inline-block
+      margin: 12px 25px
+      color: #aaa
     .addIcon, .playIcon, .text, .image
       position: absolute
       user-select: none
@@ -24,9 +27,10 @@
     .addIcon
       font-size: 50px
       text-align: center
-      line-height: 100px
       background-color: #4f5b62
       border-radius: 8px
+      i
+        line-height: 100px
     .text
       text-align: center
       bottom: 6px
@@ -51,7 +55,7 @@
   )
     template(v-if="normal")
       template(v-if="isNew")
-        .addIcon(@click="options") +
+        .addIcon(@click="options"): i.sp-plus
       template(v-else)
         .image(
           :style="'background-image:url(' + button.image + ')'"

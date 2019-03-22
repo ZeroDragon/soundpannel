@@ -62,7 +62,10 @@
           v-if="agent === 'server'"
         )
       .config(v-if="agent=== 'server'")
-        |Open this url in your smartphone: {{serverUrl}}
+        i.sp-tablet
+        | &nbsp;{{serverUrl}} &nbsp;&nbsp;
+        i.sp-display
+        | &nbsp;{{serverUrl}}overlay
     help
 </template>
 

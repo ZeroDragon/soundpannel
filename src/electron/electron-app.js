@@ -68,7 +68,7 @@ const createWindow = () => {
     {
       label: 'Sound Pannel',
       submenu: [
-        { label: `Check for updates...`, click: function () { checkForUpdates() } },
+        { label: `About`, click: function () { about() } },
         { type: 'separator' },
         { label: 'Quit', accelerator: 'CmdOrCtrl+Q', click: function () { app.quit() } }
       ]
@@ -82,17 +82,43 @@ const createWindow = () => {
   checkForUpdates()
 }
 
-const checkForUpdates = () => {
+const about = () => {
+  dialog.showMessageBox({
+    type: 'info',
+    buttons: ['Check for updates', 'Close'],
+    defaultId: 0,
+    title: `Sound Pannel`,
+    message: `Version: ${app.getVersion()}`,
+    detail: 'Sound Pannel created with ❤️ by @ZeroDragon'
+  }, (response) => {
+    if (response === 0) {
+      checkForUpdates((_error, hasUpdates) => {
+        if (!hasUpdates) {
+          dialog.showMessageBox({
+            type: 'info',
+            buttons: ['Close'],
+            title: `Sound Pannel`,
+            message: `Success`,
+            detail: 'You are playing with the newest version available'
+          }, () => { })
+        }
+      })
+    }
+  })
+}
+
+const checkForUpdates = (cb = () => {}) => {
   updater((_error, hasUpdates) => {
     if (hasUpdates) {
       dialog.showMessageBox({
         type: 'info',
         buttons: ['Close'],
-        title: `Sound Board`,
+        title: `Sound Pannel`,
         message: `New version available`,
         detail: 'There is a new version to download at https://zerodragon.github.io/soundpannel/'
-      }, (response) => { })
+      }, () => {})
     }
+    cb(_error, hasUpdates)
   })
 }
 

@@ -1,3 +1,4 @@
+@import "style.css";
 body, html {
   background-color: #263238;
 }
@@ -11,4 +12,18 @@ body {
 }
 body * {
   box-sizing: border-box;
+}
+
+body *::-webkit-scrollbar{
+  width: 10px;
+}
+body *::-webkit-scrollbar-track{
+  display: none;
+}
+body *::-webkit-scrollbar-thumb{
+  border-radius: 10px;
+  background-color:transparent;
+}
+body *:hover::-webkit-scrollbar-thumb{
+  background-color: #19252B;
 }

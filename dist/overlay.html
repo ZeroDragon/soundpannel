@@ -22,7 +22,7 @@
 </head>
 <body>
   <div id="app" class="app">
-    <div class="overlay" v-for="(over, k) in overlays" :key="k" :style="over.style"></div>
+    <div class="overlay" v-for="(over, k) in overlays" :key="over.uuid" :style="over.style"></div>
   </div>
 </body>
 <script>

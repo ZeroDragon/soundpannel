@@ -57,7 +57,7 @@
     width: 50%
   .results
     overflow: auto
-    max-height: calc(100% - 50px)
+    max-height: calc(100% - 88px)
 </style>
 
 <template lang="pug">
@@ -82,7 +82,9 @@
           .fieldZone.searcher
             label.label(for="search") Search for sfx
             input#search.input(v-model="searchT" placeholder="its over 9000")
-            btn(:action="search").green Search
+            btn(:action="search").green
+              i.sp-search
+              | &nbsp;Search
           .results
             resultsfx(
               v-for="(sfx, i) in results"
@@ -115,12 +117,18 @@
             stateEditor(v-model="overlaySettings.finish")
 
     btn.green(:action="() => {showAudio = !showAudio}")
-      template(v-if="showAudio") Overlay 
-      template(v-else) Audio 
-      | settings
-    btn(:action="save").blue Save
-    btn(:action="cancel") Cancel
-    btn(:action="del" v-if="!isNew").red Delete
+      i.sp-equalizer
+      template(v-if="showAudio") &nbsp;Overlay
+      template(v-else) &nbsp;Audio
+    btn(:action="save").blue
+      i.sp-checkmark
+      | &nbsp;Save
+    btn(:action="cancel")
+      i.sp-cross
+      | &nbsp;Cancel
+    btn(:action="del" v-if="!isNew").red
+      i.sp-bin
+      | &nbsp;Delete
 </template>
 <script>
 import btn from './btn.vue'

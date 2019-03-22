@@ -15,10 +15,11 @@
   .sfx
     .title {{sfx.title}}
     .buttons
-      btn.tiny.blue(:action="() => $emit('addsfx', sfx)") use
-      btn.tiny.blue(:action="play")
-        template(v-if="playing") stop
-        template(v-else) play
+      btn.tiny.green(:action="() => $emit('addsfx', sfx)"): i.sp-arrow-left
+      template(v-if="playing")
+        btn.tiny.red(:action="play"): i.sp-stop
+      template(v-else)
+        btn.tiny.blue(:action="play"): i.sp-play
 </template>
 
 <script>
