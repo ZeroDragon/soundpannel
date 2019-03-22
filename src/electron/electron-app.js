@@ -1,13 +1,11 @@
 const { BrowserWindow, app, Menu, dialog } = require('electron')
 const { writeFileSync, readFileSync } = require('fs')
 const { join } = require('path')
-const { updater, checker } = require('./updater')
+const { updater } = require('./updater')
 const { http } = require('./server')
 
 const port = 3000
 let win
-let updating = false
-let updateDownloaded = false
 
 const createWindow = () => {
   let electronSettings
@@ -81,55 +79,19 @@ const createWindow = () => {
     }
   ]
   Menu.setApplicationMenu(Menu.buildFromTemplate(menu))
+  checkForUpdates()
 }
 
 const checkForUpdates = () => {
-  if (updating) {
-    dialog.showMessageBox({
-      type: 'info',
-      buttons: ['Close'],
-      title: `Sound Board`,
-      message: `Hang on a sec`,
-      detail: 'We are downloading the update...'
-    }, (response) => {})
-    return
-  }
-  if (updateDownloaded) {
-    dialog.showMessageBox({
-      type: 'info',
-      buttons: ['Close'],
-      title: 'Sound Board',
-      message: `Download finished`,
-      detail: 'The new version will be ready next time you run open this app'
-    }, () => { })
-    return
-  }
-  checker((_error, hasUpdates) => {
+  updater((_error, hasUpdates) => {
     if (hasUpdates) {
       dialog.showMessageBox({
         type: 'info',
-        buttons: ['Download update', 'Close'],
-        title: `Sound Board. Current version: ${app.getVersion()}`,
-        message: `There is a new version available. Do you want to start the download?`,
-        detail: 'Download will accur in the background'
-      }, (response) => {
-        if (response === 0) {
-          updating = true
-          updater(() => {
-            updating = false
-            updateDownloaded = true
-            checkForUpdates()
-          }, true)
-        }
-      })
-    } else {
-      dialog.showMessageBox({
-        type: 'info',
         buttons: ['Close'],
-        title: 'Sound Board',
-        message: `Success`,
-        detail: 'Your are running the latest version!'
-      }, () => { })
+        title: `Sound Board`,
+        message: `New version available`,
+        detail: 'There is a new version to download at https://zerodragon.github.io/soundpannel/'
+      }, (response) => { })
     }
   })
 }
