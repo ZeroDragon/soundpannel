@@ -17,13 +17,13 @@
     .section(v-for="(val, key) in shadow")
       span.key {{key}}
       input(:value="val" @input="update($event.target.value, key)")
-      btn.red.tiny(:action="() => {deleteKey(key)}") delete
+      btn.red.tiny(:action="() => {deleteKey(key)}"): i.sp-bin
     .section.new(v-show="optionsLeft.length > 0")
       select.key(v-model="newKey")
         option(:value="null" disabled) Select one
         option(v-for="opt in optionsLeft" :value="opt") {{opt}}
       input(v-model="newVal")
-      btn.blue.tiny(:action="insertKey") insert
+      btn.blue.tiny(:action="insertKey"): i.sp-plus
 </template>
 <script>
 import btn from './btn.vue'

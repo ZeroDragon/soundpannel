@@ -18,6 +18,8 @@
     padding: 2px 4px
     margin: 0 2px
     border-radius: 2px
+    i
+      line-height: 14px
   &:hover
     background-color: darken(#909090, 10%)
   &.blue
