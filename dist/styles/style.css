@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'SoundPannel';
   src:
-    url('fonts/SoundPannel.ttf?h4ngiz') format('truetype'),
-    url('fonts/SoundPannel.woff?h4ngiz') format('woff'),
-    url('fonts/SoundPannel.svg?h4ngiz#SoundPannel') format('svg');
+    url('fonts/SoundPannel.ttf?bucnz6') format('truetype'),
+    url('fonts/SoundPannel.woff?bucnz6') format('woff'),
+    url('fonts/SoundPannel.svg?bucnz6#SoundPannel') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -40,6 +40,18 @@ i {
 }
 .sp-bin:before {
   content: "\e9ac";
+}
+.sp-cloud:before {
+  content: "\e9c1";
+}
+.sp-cloud-down:before {
+  content: "\e9c2";
+}
+.sp-cloud-up:before {
+  content: "\e9c3";
+}
+.sp-cloud-ok:before {
+  content: "\e9c4";
 }
 .sp-plus:before {
   content: "\ea0a";

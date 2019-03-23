@@ -27,7 +27,8 @@
       left: -50px
   .config
     border-top: 1px dashed rgba(#fff, 0.4)
-    text-align: center
+    display: flex
+    justify-content: center
 </style>
 
 <template lang="pug">
@@ -62,11 +63,17 @@
           v-if="agent === 'server'"
         )
       .config(v-if="agent=== 'server'")
+        cloud(
+          :serverUrl="serverUrl"
+          @newUrl="updateServer"
+        )
+        | &nbsp;&nbsp;
         i.sp-tablet
-        | &nbsp;{{serverUrl}} &nbsp;&nbsp;
+        | &nbsp;{{bottomUrl}}
+        | &nbsp;&nbsp;
         i.sp-display
-        | &nbsp;{{serverUrl}}overlay
-    help
+        | &nbsp;{{bottomUrl}}overlay
+    help(:serverUrl="serverUrl")
 </template>
 
 <script>
@@ -75,12 +82,14 @@ import { getUserIP } from '../ipFinder'
 import appHeader from './header.vue'
 import soundButton from './soundButton.vue'
 import help from './help.vue'
+import cloud from './cloud.vue'
 
 export default {
   data: () => ({
     buttons: [],
     agent: 'client',
     serverUrl: `${window.location.origin}/`,
+    bottomUrl: `${window.location.origin}/`,
     socket: null,
     draggingItem: null
   }),
@@ -168,6 +177,13 @@ export default {
       btn.key = Math.round((Math.random() * 1000) * (Math.random() * 1000))
       btn.key = button.key
       this.saveToMemory()
+    },
+    updateServer (newUrl) {
+      if (newUrl === '') {
+        this.bottomUrl = this.serverUrl
+        return
+      }
+      this.bottomUrl = `${newUrl}/`
     }
   },
   beforeMount () {
@@ -187,7 +203,8 @@ export default {
   components: {
     appHeader,
     soundButton,
-    help
+    help,
+    cloud
   }
 }
 </script>

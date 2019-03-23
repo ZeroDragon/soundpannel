@@ -7,6 +7,7 @@ const { join } = require('path')
 const { readFileSync, writeFileSync } = require('fs')
 const request = require('request')
 const cheerio = require('cheerio')
+const cloudServer = require('./cloudServer')
 
 const expressApp = express()
 const http = Http.Server(expressApp)
@@ -25,6 +26,23 @@ expressApp.get('/buttons.json', (req, res) => {
     json = JSON.parse(readFileSync(path, { encoding: 'utf8' }))
   } catch (_error) {
     json = []
+  }
+  res.json(json)
+})
+
+expressApp.post('/settings.json', (req, res) => {
+  const path = join(app.getPath('userData'), 'settings.json')
+  writeFileSync(path, JSON.stringify(req.body, false, 2))
+  res.json({ success: true })
+})
+
+expressApp.get('/settings.json', (req, res) => {
+  let json
+  try {
+    const path = join(app.getPath('userData'), 'settings.json')
+    json = JSON.parse(readFileSync(path, { encoding: 'utf8' }))
+  } catch (_error) {
+    json = {}
   }
   res.json(json)
 })
@@ -59,6 +77,20 @@ expressApp.get('/search', (req, res) => {
 
 expressApp.get('/overlay', (req, res) => {
   res.sendFile(join(__dirname, '../../dist/overlay.html'))
+})
+
+expressApp.get('/cloudStatus', (req, res) => {
+  res.json({ success: true, status: cloudServer.status(), url: cloudServer.url() })
+})
+
+expressApp.get('/startCloud', async (req, res) => {
+  await cloudServer.start()
+  res.json({ success: true, url: cloudServer.url() })
+})
+
+expressApp.get('/stopCloud', (req, res) => {
+  cloudServer.stop()
+  res.json({ success: true, url: '' })
 })
 
 expressApp.get('/', (req, res) => {

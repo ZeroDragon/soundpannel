@@ -44,7 +44,21 @@ h3
     .holder
       .icon.open(@click="open" v-show="left===100"): i.sp-cog
       .helpSection
-        .column a
+        .column
+          fieldZone.searcher(
+            label="Ngrok location"
+            v-model="settings.ngrok"
+            itm="ngrok"
+            placeholder="/absolute/path/to/ngrok"
+            p=`
+              Ngrok is used to create a unique URL for your Sound Pannel that can be used for overlaying or remote controller over the internet.
+              <br/><br/>
+              You can get ngrok from https://ngrok.com/
+            `
+          )
+            btn.green(:action="saveUserSettings")
+              i.sp-checkmark
+              |&nbsp;&nbsp;Save
         .column
           h3 Help
           b Create a new button
@@ -63,6 +77,9 @@ h3
           p.
             You can also add custom overlays to your broadcast on any software that supports adding a web browser.
             Just add a web view on your broadcast software and point it to the URL after the <i class="sp-display"></i> icon
+          b Activate the internet
+          p.
+            Once Ngrok is configurated, just click the <i class="sp-cloud"></i> icon on the app footer to toggle it.
           b Author: ZeroDragon (Carlos Flores)
           p.
             - twitter.com/zerodragon <br/>
@@ -72,9 +89,12 @@ h3
       .icon(@click="close" v-show="left===0"): i.sp-cross
 </template>
 <script>
+import fieldZone from './fieldZone.vue'
+import btn from './btn.vue'
 export default {
   data: () => ({
-    left: 100
+    left: 100,
+    settings: {}
   }),
   methods: {
     open () {
@@ -82,6 +102,31 @@ export default {
     },
     close () {
       this.left = 100
+    },
+    async saveUserSettings () {
+      const response = await window.fetch(`${this.serverUrl}settings.json`, {
+        method: 'POST',
+        headers: { 'Content-type': 'application/json' },
+        body: JSON.stringify(this.settings)
+      })
+      const json = await response.json()
+    },
+    async getUserSettigng () {
+      const response = await window.fetch(`${this.serverUrl}settings.json`)
+      const json = await response.json()
+      this.settings = json
+    }
+  },
+  mounted () {
+    this.getUserSettigng()
+  },
+  components: {
+    fieldZone,
+    btn
+  },
+  props: {
+    serverUrl: {
+      default: ''
     }
   }
 }
