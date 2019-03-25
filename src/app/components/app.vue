@@ -73,7 +73,7 @@
         | &nbsp;&nbsp;
         i.sp-display
         | &nbsp;{{bottomUrl}}overlay
-    help(:serverUrl="serverUrl")
+    help(:serverUrl="serverUrl", v-if="agent=== 'server'")
 </template>
 
 <script>

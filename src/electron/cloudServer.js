@@ -47,7 +47,6 @@ const start = () => {
     if (success) {
       ngrok.status = 'online'
       ngrok.url = success[1]
-      console.log(ngrok.url, ngrok.status)
       pResolve(true)
     }
   })
