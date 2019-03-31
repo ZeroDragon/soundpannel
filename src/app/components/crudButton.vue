@@ -14,6 +14,8 @@
   display: flex
   .column
     width: 50%
+    padding: 0 5px
+    overflow: auto
   .results
     overflow: auto
     max-height: calc(100% - 88px)
@@ -41,13 +43,13 @@
             )
       template(v-else)
         .column
-          label.label(for="enableOl") Enable overlay
-          input#enableOl(type="checkbox" value="true" v-model="overlaySettings.enable")
+          switchField(label="Enable overlay" v-model="overlaySettings.enable")
           fieldZone(label="Animation In" v-model="overlaySettings.animationIn" itm="animationIn" placeholder="Time of enter animation")
           fieldZone(label="Animation Out" v-model="overlaySettings.animationOut" itm="animationOut" placeholder="Time of exit animation")
           fieldZone(label="Duration" v-model="overlaySettings.duration" itm="duration" placeholder="infinite")
           fieldZone(label="Overlay image" v-model="overlaySettings.image" itm="olImage" placeholder="Url")
         .column
+          previewAnimation(:settings="overlaySettings")
           .fieldZone
             label.label Start state
             stateEditor(v-model="overlaySettings.start")
@@ -74,6 +76,8 @@ import btn from './btn.vue'
 import resultsfx from './resultsfx.vue'
 import stateEditor from './stateEditor.vue'
 import fieldZone from './fieldZone.vue'
+import switchField from './switchField.vue'
+import previewAnimation from './previewAnimation.vue'
 export default {
   data: () => ({
     image: '',
@@ -117,7 +121,7 @@ export default {
         image: this.image,
         text: this.text,
         sound: this.sound,
-        volume: this.volume / 10,
+        volume: this.volume / 100,
         overlaySettings: this.overlaySettings
       })
     }
@@ -127,7 +131,7 @@ export default {
     this.image = this.value.image
     this.text = this.value.text
     this.sound = this.value.sound
-    this.volume = this.value.volume * 10
+    this.volume = this.value.volume * 100
     this.overlaySettings = JSON.parse(JSON.stringify(this.value.overlaySettings))
   },
   props: {
@@ -140,7 +144,9 @@ export default {
     btn,
     resultsfx,
     stateEditor,
-    fieldZone
+    fieldZone,
+    previewAnimation,
+    switchField
   }
 }
 </script>

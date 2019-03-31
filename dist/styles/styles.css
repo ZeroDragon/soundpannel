@@ -14,16 +14,12 @@ body * {
   box-sizing: border-box;
 }
 
-body *::-webkit-scrollbar{
+*::-webkit-scrollbar, *::-webkit-scrollbar-thumb {
   width: 10px;
 }
-body *::-webkit-scrollbar-track{
-  display: none;
+*::-webkit-scrollbar-thumb {
+  background-color: transparent;
 }
-body *::-webkit-scrollbar-thumb{
-  border-radius: 10px;
-  background-color:transparent;
-}
-body *:hover::-webkit-scrollbar-thumb{
-  background-color: #19252B;
+*:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(255,255,255,0.2);
 }

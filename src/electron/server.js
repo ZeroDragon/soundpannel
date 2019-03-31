@@ -1,4 +1,4 @@
-const { app } = require('electron')
+const { app, dialog } = require('electron')
 const express = require('express')
 const Http = require('http')
 const cors = require('cors')
@@ -8,6 +8,7 @@ const { readFileSync, writeFileSync } = require('fs')
 const request = require('request')
 const cheerio = require('cheerio')
 const cloudServer = require('./cloudServer')
+const chat = require('./chat')
 
 const expressApp = express()
 const http = Http.Server(expressApp)
@@ -28,6 +29,23 @@ expressApp.get('/buttons.json', (req, res) => {
     json = []
   }
   res.json(json)
+})
+
+expressApp.get('/downloadbuttons', (req, res) => {
+  dialog.showSaveDialog({
+    defaultPath: '~/buttons.json'
+  }, location => {
+    if (!location) return
+    let json
+    try {
+      const path = join(app.getPath('userData'), 'buttons.json')
+      json = JSON.parse(readFileSync(path, { encoding: 'utf8' }))
+    } catch (_error) {
+      json = []
+    }
+    writeFileSync(location, JSON.stringify(json, false, 2))
+  })
+  res.sendStatus(200)
 })
 
 expressApp.post('/settings.json', (req, res) => {
@@ -51,6 +69,7 @@ expressApp.post('/buttons.json', (req, res) => {
   const path = join(app.getPath('userData'), 'buttons.json')
   writeFileSync(path, JSON.stringify(req.body, false, 2))
   res.json({ success: true })
+  if (req.query.willReload) global.win.reload()
 })
 
 expressApp.get('/search', (req, res) => {
@@ -77,6 +96,37 @@ expressApp.get('/search', (req, res) => {
 
 expressApp.get('/overlay', (req, res) => {
   res.sendFile(join(__dirname, '../../dist/overlay.html'))
+})
+
+expressApp.get('/overlay-chat', (req, res) => {
+  res.sendFile(join(__dirname, '../../dist/chat.html'))
+})
+
+const sse = (req, res) => {
+  const localIndex = {}
+  const intervalId = setInterval(() => {
+    const messages = chat()
+    for (let comment of Object.values(messages)) {
+      if (localIndex[comment.key]) continue
+      localIndex[comment.key] = true
+      res.write(`id: ${comment.key}\n`)
+      res.write(`data: ${JSON.stringify(comment)}\n\n`)
+    }
+  }, 1000)
+
+  req.on('close', () => {
+    clearInterval(intervalId)
+  })
+}
+
+expressApp.get('/chat-stream', (req, res) => {
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive'
+  })
+  res.write('\n')
+  sse(req, res)
 })
 
 expressApp.get('/cloudStatus', (req, res) => {

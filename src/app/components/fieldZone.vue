@@ -64,7 +64,7 @@ p
         :key="itm"
         type="range"
         min="0"
-        max="10"
+        max="100"
         :value="value"
         @input="emit"
       )

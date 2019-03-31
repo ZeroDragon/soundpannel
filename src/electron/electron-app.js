@@ -5,7 +5,6 @@ const { updater } = require('./updater')
 const { http } = require('./server')
 
 const port = 3000
-let win
 
 const createWindow = () => {
   let electronSettings
@@ -17,7 +16,7 @@ const createWindow = () => {
   } catch (_error) {
     electronSettings = {}
   }
-  win = new BrowserWindow(
+  global.win = new BrowserWindow(
     Object.assign(
       electronSettings,
       {
@@ -28,14 +27,14 @@ const createWindow = () => {
       }
     )
   )
-  win.loadURL(`http://localhost:${port}/`)
-  win.on('close', () => {
-    const bounds = win.getBounds()
+  global.win.loadURL(`http://localhost:${port}/`)
+  global.win.on('close', () => {
+    const bounds = global.win.getBounds()
     const settingsFile = join(app.getPath('userData'), 'electron-settings.json')
     writeFileSync(settingsFile, JSON.stringify(bounds, false, 2))
   })
-  win.on('closed', () => {
-    win = null
+  global.win.on('closed', () => {
+    global.win = null
   })
 
   const editMenu = [
@@ -133,7 +132,7 @@ app.on('window-all-closed', () => {
 })
 
 app.on('activate', () => {
-  if (win === null) {
+  if (global.win === null) {
     createWindow()
   }
 })

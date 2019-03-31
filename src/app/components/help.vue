@@ -45,20 +45,7 @@ h3
       .icon.open(@click="open" v-show="left===100"): i.sp-cog
       .helpSection
         .column
-          fieldZone.searcher(
-            label="Ngrok location"
-            v-model="settings.ngrok"
-            itm="ngrok"
-            placeholder="/absolute/path/to/ngrok"
-            p=`
-              Ngrok is used to create a unique URL for your Sound Pannel that can be used for overlaying or remote controller over the internet.
-              <br/><br/>
-              You can get ngrok from https://ngrok.com/
-            `
-          )
-            btn.green(:action="saveUserSettings")
-              i.sp-checkmark
-              |&nbsp;&nbsp;Save
+          settings
         .column
           h3 Help
           b Create a new button
@@ -77,6 +64,13 @@ h3
           p.
             You can also add custom overlays to your broadcast on any software that supports adding a web browser.
             Just add a web view on your broadcast software and point it to the URL after the <i class="sp-display"></i> icon
+          b Chat overlay
+          p.
+            NOTE, youtube and discord settings require app restart to take effect
+          p.
+            Similar to regular overlay, you can add a small chat for your transmissions, if you area transmiting to youtube, just add your youtube video ID.
+          p.
+            Also if you have a discord server, you can pull discord chat using a simple bot built-in Sound Pannel. Just need to create the app, and paste the app token and the desired channel to pull messages from.
           b Activate the internet
           p.
             Once Ngrok is configurated, just click the <i class="sp-cloud"></i> icon on the app footer to toggle it.
@@ -89,12 +83,10 @@ h3
       .icon(@click="close" v-show="left===0"): i.sp-cross
 </template>
 <script>
-import fieldZone from './fieldZone.vue'
-import btn from './btn.vue'
+import settings from './settings.vue'
 export default {
   data: () => ({
     left: 100,
-    settings: {}
   }),
   methods: {
     open () {
@@ -103,31 +95,9 @@ export default {
     close () {
       this.left = 100
     },
-    async saveUserSettings () {
-      const response = await window.fetch(`${this.serverUrl}settings.json`, {
-        method: 'POST',
-        headers: { 'Content-type': 'application/json' },
-        body: JSON.stringify(this.settings)
-      })
-      const json = await response.json()
-    },
-    async getUserSettigng () {
-      const response = await window.fetch(`${this.serverUrl}settings.json`)
-      const json = await response.json()
-      this.settings = json
-    }
-  },
-  mounted () {
-    this.getUserSettigng()
   },
   components: {
-    fieldZone,
-    btn
-  },
-  props: {
-    serverUrl: {
-      default: ''
-    }
+    settings
   }
 }
 </script>

@@ -1,0 +1,97 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Sound Pannel</title>
+  <link rel="stylesheet" type="text/css" href="/styles/style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.8/vue.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    .chatHolder {
+      height: 150px;
+      overflow: hidden;
+      color: #282828;
+      font-family: sans-serif;
+      font-size: 14px;
+      display: flex;
+      flex-direction: column-reverse;
+    }
+    .data {
+      width: 100%;
+    }
+    .icon {
+      font-size: 30px;
+      line-height: 40px;
+      text-align: center;
+      width: 40px;
+      height: 40px;
+    }
+    .message {
+      display: flex;
+      padding: 4px;
+      height: 50px;
+      transition: all 2s;
+    }
+    .author {
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .message-list-enter, .message-list-leave-to{
+      opacity: 0;
+      transform: translateX(30px);
+    }
+  </style>
+</head>
+
+<body oncontextmenu="return false;">
+  <div id="app" class="chatHolder">
+    <transition-group name="message-list">
+      <div v-for="(message, k) in messages" :key="message.key" class="message">
+        <div class="icon">
+          <i :class="'sp-' + message.value.source"></i>
+        </div>
+        <div class="data" >
+          <div class="author">{{message.value.author}}</div>
+          <div class="text">{{message.value.message}}</div>
+        </div>
+      </div>
+    </transition-group>
+  </div>
+  <script>
+    const vue = new Vue({
+      el: '#app',
+      data: {
+        rawMessages: {},
+        messages: [],
+      },
+      methods: {
+        processMessages () {
+          const messages = Object.values(this.rawMessages)
+          this.messages = messages
+            .slice(-10)
+            .sort((a, b) => {
+              if (a.value.timestamp > b.value.timestamp) return 1
+              if (a.value.timestamp < b.value.timestamp) return -1
+              return 0
+            })
+          setTimeout(() => {
+            this.processMessages()
+          }, 1000)
+        }
+      },
+      mounted () {
+        const sseSource = new EventSource('/chat-stream')
+        sseSource.addEventListener('message', (e) => {
+          const message = JSON.parse(e.data)
+          this.rawMessages[message.key] = message
+        })
+        this.processMessages()
+      }
+    })
+  </script>
+</body>
+
+</html>

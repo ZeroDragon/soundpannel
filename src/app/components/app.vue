@@ -45,7 +45,6 @@
           soundButton(
             :key="button.key"
             :button="button"
-            :agent="agent"
             :socket="socket"
             @update="changeButton"
             @del="del"
@@ -73,22 +72,23 @@
         | &nbsp;&nbsp;
         i.sp-display
         | &nbsp;{{bottomUrl}}overlay
-    help(:serverUrl="serverUrl", v-if="agent=== 'server'")
+    help(v-if="agent=== 'server'")
 </template>
 
 <script>
 import io from 'socket.io-client'
 import { getUserIP } from '../ipFinder'
+import { store, mutations } from '../store'
+import { loadFromMemory, saveToMemory } from '../api'
 import appHeader from './header.vue'
 import soundButton from './soundButton.vue'
 import help from './help.vue'
 import cloud from './cloud.vue'
+import { loadavg } from 'os';
 
 export default {
   data: () => ({
     buttons: [],
-    agent: 'client',
-    serverUrl: `${window.location.origin}/`,
     bottomUrl: `${window.location.origin}/`,
     socket: null,
     draggingItem: null
@@ -127,23 +127,14 @@ export default {
       this.saveToMemory()
     },
     async loadFromMemory () {
-      this.socket = io(this.serverUrl)
-      const response = await window.fetch(`${this.serverUrl}buttons.json`)
-      const json = await response.json()
+      const json = await loadFromMemory(`${this.serverUrl}buttons.json`)
       this.buttons = json.map((itm, index) => {
         itm.key = index + 1
         return itm
       })
     },
     async saveToMemory () {
-      const response = await window.fetch(`${this.serverUrl}buttons.json`, {
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/json'
-        },
-        body: JSON.stringify(this.buttons)
-      })
-      const json = await response.json()
+      await saveToMemory(`${this.serverUrl}buttons.json`, this.buttons)
     },
     del (button) {
       this.buttons = this.buttons.filter(btn => {
@@ -186,19 +177,29 @@ export default {
       this.bottomUrl = `${newUrl}/`
     }
   },
-  beforeMount () {
+  async beforeMount () {
+    const devices = await navigator.mediaDevices.enumerateDevices()
+    const audioDevices = devices.filter(device => device.kind === 'audiooutput')
+    mutations.set('audioDevices', audioDevices)
+
     const agent = navigator.userAgent.toLowerCase()
     if (agent.indexOf('electron') !== -1) {
-      this.agent = 'server'
+      mutations.set('agent', 'server')
     }
     if (this.agent === 'server') {
       getUserIP(ip => {
-        this.serverUrl = `http://${ip}:3000/`
+        mutations.set('serverUrl',`http://${ip}:3000/`)
+        this.socket = io(this.serverUrl)
         this.loadFromMemory()
       })
     } else {
+      this.socket = io(this.serverUrl)
       this.loadFromMemory()
     }
+  },
+  computed: {
+    serverUrl () { return store.serverUrl },
+    agent () { return store.agent }
   },
   components: {
     appHeader,

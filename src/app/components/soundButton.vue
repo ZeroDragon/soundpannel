@@ -45,6 +45,7 @@
       background-size: cover
       background-position: center
       background-repeat: no-repeat
+      box-shadow: inset 0px 0px 4px 3px rgba(255,255,255,0.48)
 </style>
 <template lang="pug">
   .soundButton(
@@ -60,7 +61,7 @@
         .image(
           :style="'background-image:url(' + button.image + ')'"
         )
-        .text {{button.text}}
+        .text {{button.text}} {{deviceId}}
         .playIcon(
           @click="playSound"
           @contextmenu="options"
@@ -76,6 +77,7 @@
 </template>
 <script>
 import crudButton from './crudButton.vue'
+import { store } from '../store'
 export default {
   data: () => ({
     audio: null,
@@ -92,6 +94,12 @@ export default {
   computed: {
     isNormal () {
       return this.normal
+    },
+    agent () { return store.agent },
+    deviceId () {
+      if (!this.audio) return
+      this.audio.setSinkId(store.deviceId)
+      return null
     }
   },
   methods: {
@@ -145,18 +153,6 @@ export default {
       }
     }
   },
-  props: {
-    isNew: {
-      default: false
-    },
-    button: {},
-    agent: {
-      default: 'client'
-    },
-    socket: {
-      default: null
-    }
-  },
   mounted () {
     if (this.isNew) return
     this.loadData()
@@ -167,6 +163,15 @@ export default {
   },
   components: {
     crudButton
+  },
+  props: {
+    isNew: {
+      default: false
+    },
+    button: {},
+    socket: {
+      default: null
+    }
   }
 }
 </script>

@@ -23,3 +23,9 @@ build.win:
 
 build.mac:
 	npm run build-mac
+
+electron:
+	npm run electron
+
+webpack:
+	npm run webpack
