@@ -19,7 +19,7 @@ build.win:
 	-v ~/.cache/electron:/root/.cache/electron \
 	-v ~/.cache/electron-builder:/root/.cache/electron-builder \
 	electronuserland/builder:wine \
-	/bin/bash -c "npm run build-win"
+	/bin/bash -c "npm i && npm run build-win"
 
 build.mac:
 	npm run build-mac
