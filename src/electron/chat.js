@@ -1,4 +1,3 @@
-const youtube = require('./youtubeMiner')
 const discord = require('./discordMiner')
 const { join } = require('path')
 const { readFileSync } = require('fs')
@@ -13,12 +12,10 @@ try {
   json = {}
 }
 
-const youtubeMessages = youtube.start(json)
 const discordMessages = discord.start(json)
 
 module.exports = () => {
   return Object.assign(
-    clone(discordMessages),
-    clone(youtubeMessages)
+    clone(discordMessages)
   )
 }

@@ -9,6 +9,7 @@ const request = require('request')
 const cheerio = require('cheerio')
 const cloudServer = require('./cloudServer')
 const chat = require('./chat')
+const { musicPlayer } = require('./musicPlayer.js')
 
 const expressApp = express()
 const http = Http.Server(expressApp)
@@ -145,6 +146,14 @@ expressApp.get('/stopCloud', (req, res) => {
 
 expressApp.get('/', (req, res) => {
   res.sendFile(join(__dirname, '../../dist/index.html'))
+})
+
+expressApp.get('/webamp', (req, res) => {
+  res.sendFile(join(__dirname, '../../dist/webamp.html'))
+})
+
+expressApp.get('/openWebAmp', (req, res) => {
+  musicPlayer(http.address().port)
 })
 
 io.on('connection', socket => {

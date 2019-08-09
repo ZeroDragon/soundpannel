@@ -178,17 +178,19 @@ export default {
     }
   },
   async beforeMount () {
-    const devices = await navigator.mediaDevices.enumerateDevices()
-    const audioDevices = devices.filter(device => device.kind === 'audiooutput')
-    mutations.set('audioDevices', audioDevices)
-
     const agent = navigator.userAgent.toLowerCase()
     if (agent.indexOf('electron') !== -1) {
       mutations.set('agent', 'server')
     }
     if (this.agent === 'server') {
+
+      const devices = await navigator.mediaDevices.enumerateDevices()
+      const audioDevices = devices.filter(device => device.kind === 'audiooutput')
+      mutations.set('audioDevices', audioDevices)
+
       getUserIP(ip => {
         mutations.set('serverUrl',`http://${ip}:3000/`)
+        this.bottomUrl = this.serverUrl
         this.socket = io(this.serverUrl)
         this.loadFromMemory()
       })

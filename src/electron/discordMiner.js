@@ -6,7 +6,7 @@ let token = null
 let channel = null
 
 client.on('message', msg => {
-  if (channel == null) return
+  if (channel == null || channel === '') return
   if (msg.channel.name !== channel) return
   const message = {
     key: `discord-${msg.id}`,

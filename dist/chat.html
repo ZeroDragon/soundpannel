@@ -6,47 +6,9 @@
   <title>Sound Pannel</title>
   <link rel="stylesheet" type="text/css" href="/styles/style.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.8/vue.js"></script>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-    .chatHolder {
-      height: 150px;
-      overflow: hidden;
-      color: #282828;
-      font-family: sans-serif;
-      font-size: 14px;
-      display: flex;
-      flex-direction: column-reverse;
-    }
-    .data {
-      width: 100%;
-    }
-    .icon {
-      font-size: 30px;
-      line-height: 40px;
-      text-align: center;
-      width: 40px;
-      height: 40px;
-    }
-    .message {
-      display: flex;
-      padding: 4px;
-      height: 50px;
-      transition: all 2s;
-    }
-    .author {
-      font-size: 12px;
-      font-weight: bold;
-    }
-    .message-list-enter, .message-list-leave-to{
-      opacity: 0;
-      transform: translateX(30px);
-    }
-  </style>
 </head>
 
-<body oncontextmenu="return false;">
+<body>
   <div id="app" class="chatHolder">
     <transition-group name="message-list">
       <div v-for="(message, k) in messages" :key="message.key" class="message">
@@ -61,6 +23,13 @@
     </transition-group>
   </div>
   <script>
+    const insertStyle = style => {
+      const head = document.head
+      const styleTag = document.createElement('style')
+      styleTag.id = 'insertedStyles'
+      styleTag.innerHTML = style
+      head.appendChild(styleTag)
+    }
     const vue = new Vue({
       el: '#app',
       data: {
@@ -81,6 +50,11 @@
             this.processMessages()
           }, 1000)
         }
+      },
+      async beforeMount () {
+        const response = await window.fetch('/settings.json')
+        const { chatStyles } = await response.json()
+        insertStyle(chatStyles)
       },
       mounted () {
         const sseSource = new EventSource('/chat-stream')

@@ -98,6 +98,7 @@ export default {
     agent () { return store.agent },
     deviceId () {
       if (!this.audio) return
+      if (!this.audio.setSinkId) return
       this.audio.setSinkId(store.deviceId)
       return null
     }

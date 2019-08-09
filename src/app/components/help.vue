@@ -43,7 +43,7 @@ h3
   .help(:style="{left: left + '%'}")
     .holder
       .icon.open(@click="open" v-show="left===100"): i.sp-cog
-      .helpSection
+      .helpSection(v-if="left===0")
         .column
           settings
         .column
