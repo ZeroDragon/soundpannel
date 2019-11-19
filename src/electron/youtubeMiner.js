@@ -21,9 +21,12 @@ class YouTube extends EventEmitter {
       '&type=video' +
       `&key=${this.key}`
     this.request(url, data => {
-      if (!data.items[0])
+      if (!data.items[0]) {
         this.emit('error', 'Can not find live.')
-      else {
+        setTimeout(() => {
+          this.getLive()
+        }, 10000)
+      } else {
         this.liveId = data.items[0].id.videoId
         this.getChatId()
       }
