@@ -1,8 +1,9 @@
-const discord = require('./discordMiner')
+const { EventEmitter } = require('events')
 const { join } = require('path')
 const { readFileSync } = require('fs')
 const { app } = require('electron')
-const clone = obj => JSON.parse(JSON.stringify(obj))
+const Discord = require('./discordMiner')
+const Youtube = require('./youtubeMiner')
 
 let json
 try {
@@ -12,10 +13,22 @@ try {
   json = {}
 }
 
-const discordMessages = discord.start(json)
+console.log(json)
 
-module.exports = () => {
-  return Object.assign(
-    clone(discordMessages)
-  )
+class Chat extends EventEmitter {
+  constructor(json) {
+    super()
+    this.json = json
+    this.getLive()
+  }
+
+  getLive() {
+    const discord = new Discord(json)
+    const youtube = new Youtube(json)
+    const emmitMessage = message => this.emit('message', message)
+    discord.on('message', emmitMessage)
+    youtube.on('message', emmitMessage)
+  }
 }
+
+module.exports = Chat

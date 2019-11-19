@@ -8,8 +8,7 @@ const { readFileSync, writeFileSync } = require('fs')
 const request = require('request')
 const cheerio = require('cheerio')
 const cloudServer = require('./cloudServer')
-const chat = require('./chat')
-const { musicPlayer } = require('./musicPlayer.js')
+const Chat = require('./chat')
 
 const expressApp = express()
 const http = Http.Server(expressApp)
@@ -104,19 +103,10 @@ expressApp.get('/overlay-chat', (req, res) => {
 })
 
 const sse = (req, res) => {
-  const localIndex = {}
-  const intervalId = setInterval(() => {
-    const messages = chat()
-    for (let comment of Object.values(messages)) {
-      if (localIndex[comment.key]) continue
-      localIndex[comment.key] = true
-      res.write(`id: ${comment.key}\n`)
-      res.write(`data: ${JSON.stringify(comment)}\n\n`)
-    }
-  }, 1000)
-
-  req.on('close', () => {
-    clearInterval(intervalId)
+  const chat = new Chat()
+  chat.on('message', message => {
+    res.write(`id: ${message.key}\n`)
+    res.write(`data: ${JSON.stringify(message)}\n\n`)
   })
 }
 
@@ -146,14 +136,6 @@ expressApp.get('/stopCloud', (req, res) => {
 
 expressApp.get('/', (req, res) => {
   res.sendFile(join(__dirname, '../../dist/index.html'))
-})
-
-expressApp.get('/webamp', (req, res) => {
-  res.sendFile(join(__dirname, '../../dist/webamp.html'))
-})
-
-expressApp.get('/openWebAmp', (req, res) => {
-  musicPlayer(http.address().port)
 })
 
 io.on('connection', socket => {

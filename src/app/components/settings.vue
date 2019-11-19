@@ -39,6 +39,13 @@ p
     input.field(v-model="settings.discordToken", placeholder="Discord token")
     p and define a discord channel
     input.field(v-model="settings.discordChannel", placeholder="discord channel")
+
+    b Youtube
+    p Get youtube live chat on your stream, You'll need your youtube api key
+    input.field(v-model="settings.youtubeKey", placeholder="Youtube API key")
+    p also the Channel ID
+    input.field(v-model="settings.youtubeChannel", placeholder="Youtube Channel ID")
+
     b Chat stylesheet
     p This are the styles that are in the chat overlay. To reset them to default, just erase everything and click save.
     pre.textarea: code.css(ref="styleSheet" contenteditable="true") {{settings.chatStyles}}
@@ -46,7 +53,6 @@ p
       i.sp-checkmark
       |&nbsp;&nbsp;{{saving}}
     exporter
-    btn.green(:action="openWebAmp") Music Player
 </template>
 <script>
 import btn from './btn.vue'

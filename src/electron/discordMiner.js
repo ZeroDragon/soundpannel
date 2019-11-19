@@ -1,30 +1,34 @@
-const Discord = require('discord.js')
-const client = new Discord.Client()
+const DiscordJS = require('discord.js')
+const { EventEmitter } = require('events')
 
-let brain = {}
-let token = null
-let channel = null
-
-client.on('message', msg => {
-  if (channel == null || channel === '') return
-  if (msg.channel.name !== channel) return
-  const message = {
-    key: `discord-${msg.id}`,
-    value: {
-      timestamp: new Date(msg.createdTimestamp),
-      author: msg.author.username,
-      source: 'discord',
-      message: msg.content
-    }
+class Discord extends EventEmitter {
+  constructor({ discordChannel, discordToken }) {
+    super()
+    this.token = discordToken
+    this.channel = discordChannel
+    this.getLive()
   }
-  brain[message.key] = message
-  const size = Object.keys(brain).length
-  console.log(`discord size: ${size}`)
-})
 
-exports.start = settings => {
-  token = settings.discordToken
-  channel = settings.discordChannel
-  if (token != null) client.login(token)
-  return brain
+  getLive() {
+    if (this.token == null || this.token === '') return
+    if (this.channel == null || this.channel === '') return
+    const client = new DiscordJS.Client()
+    client.login(this.token)
+    client.on('message', msg => {
+      if (msg.channel.name !== this.channel) return
+      const message = {
+        key: `discord-${msg.id}`,
+        value: {
+          timestamp: new Date(msg.createdTimestamp),
+          author: msg.author.username,
+          source: 'discord',
+          message: msg.content
+        }
+      }
+      this.emit('message', message)
+    })
+  }
+
 }
+
+module.exports = Discord
