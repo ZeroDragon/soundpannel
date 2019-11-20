@@ -22,8 +22,8 @@ class YouTube extends EventEmitter {
       `&key=${this.key}`
     this.request(url, data => {
       if (!data.items[0]) {
-        this.emit('error', 'Can not find live.')
         setTimeout(() => {
+          console.log('Live not found, cooldown for 10s')
           this.getLive()
         }, 10000)
       } else {
@@ -40,9 +40,12 @@ class YouTube extends EventEmitter {
       `&id=${this.liveId}` +
       `&key=${this.key}`
     this.request(url, data => {
-      if (!data.items.length)
-        this.emit('error', 'Can not find chat.')
-      else {
+      if (!data.items.length) {
+        console.log('Chat id not found, cooldown for 10s')
+        setTimeout(() => {
+          this.getLive()
+        }, 10000)
+      } else {
         this.chatId = data.items[0].liveStreamingDetails.activeLiveChatId
         this.listen(5000)
       }
@@ -84,12 +87,9 @@ class YouTube extends EventEmitter {
       method: 'GET',
       json: true,
     }, (error, response, data) => {
-      if (error)
-        this.emit('error', error)
-      else if (response.statusCode !== 200)
-        this.emit('error', data)
-      else
-        callback(data)
+      if (error) console.error(error)
+      else if (response.statusCode !== 200) console.error(data)
+      else callback(data)
     })
   }
 
