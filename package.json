@@ -1,7 +1,7 @@
 {
   "name": "soundpannel",
   "productName": "Sound Pannel",
-  "version": "1.7.7",
+  "version": "1.8.0",
   "description": "SFX Sound pannel for your podcasts",
   "main": "./src/index.js",
   "scripts": {
@@ -41,6 +41,7 @@
     "express": "^4.16.4",
     "request": "^2.88.0",
     "socket.io": "^2.2.0",
-    "socket.io-client": "^2.2.0"
+    "socket.io-client": "^2.2.0",
+    "websocket": "^1.0.30"
   }
 }

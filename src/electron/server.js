@@ -102,9 +102,10 @@ expressApp.get('/overlay-chat', (req, res) => {
   res.sendFile(join(__dirname, '../../dist/chat.html'))
 })
 
-const sse = (req, res) => {
-  const chat = new Chat()
+const chat = new Chat()
+const sse = (_req, res) => {
   chat.on('message', message => {
+    if (!res) return
     res.write(`id: ${message.key}\n`)
     res.write(`data: ${JSON.stringify(message)}\n\n`)
   })
@@ -118,6 +119,33 @@ expressApp.get('/chat-stream', (req, res) => {
   })
   res.write('\n')
   sse(req, res)
+})
+
+expressApp.get('/logs', (req, res) => {
+  res.sendFile(join(__dirname, '../../dist/logs.html'))
+})
+
+const sseLogs = (_req, res) => {
+  global.logger.on('message', message => {
+    if (!res) return
+    res.write(`id: ${message.key}\n`)
+    res.write(`data: ${JSON.stringify(message)}\n\n`)
+  })
+}
+
+expressApp.get('/logs-stream', (req, res) => {
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive'
+  })
+  res.write('\n')
+  sseLogs(req, res)
+})
+
+expressApp.get('/restream', (req, res) => {
+  console.log(req.query)
+  res.sendStatus(200)
 })
 
 expressApp.get('/cloudStatus', (req, res) => {

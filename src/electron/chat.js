@@ -13,13 +13,13 @@ try {
   json = {}
 }
 
-console.log(json)
-
 class Chat extends EventEmitter {
   constructor(json) {
     super()
     this.json = json
-    this.getLive()
+    setTimeout(() => {
+      this.getLive()
+    }, 5000)
   }
 
   getLive() {

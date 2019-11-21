@@ -1,3 +1,4 @@
+require('./logger')
 const { BrowserWindow, app, Menu, dialog } = require('electron')
 const { writeFileSync, readFileSync } = require('fs')
 const { join } = require('path')

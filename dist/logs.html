@@ -1,0 +1,80 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Sound Pannel Logs</title>
+  <link rel="stylesheet" type="text/css" href="/styles/style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.8/vue.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+    .message {
+      border: 1px solid;
+      margin-bottom: 5px;
+      padding: 5px
+    }
+    .message.log {
+      background-color: #befbc8;
+    }
+    .message.debug {
+      background-color: #bed9fb;
+    }
+    .message.error {
+      background-color: #fff3f3;
+    }
+    .message .timestamp {
+      font-size: 0.6em;
+      opacity: 0.6;
+    }
+    .message .text {
+      font-size: 0.8em;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app" class="chatHolder">
+    <transition-group name="message-list">
+      <div v-for="(message, k) in messages" :key="message.key" :class="'message ' + message.value.type">
+        <div class="timestamp">{{message.value.timestamp}}</div>
+        <div class="text">{{message.value.message}}</div>
+      </div>
+    </transition-group>
+  </div>
+  <script>
+    const vue = new Vue({
+      el: '#app',
+      data: {
+        rawMessages: {},
+        messages: [],
+      },
+      methods: {
+        processMessages () {
+          const messages = Object.values(this.rawMessages)
+          this.messages = messages
+            .slice(-10)
+            .sort((a, b) => {
+              if (a.value.timestamp > b.value.timestamp) return 1
+              if (a.value.timestamp < b.value.timestamp) return -1
+              return 0
+            })
+          setTimeout(() => {
+            this.processMessages()
+          }, 1000)
+        }
+      },
+      mounted () {
+        const sseSource = new EventSource('/logs-stream')
+        sseSource.addEventListener('message', (e) => {
+          const message = JSON.parse(e.data)
+          this.rawMessages[message.key] = message
+        })
+        this.processMessages()
+      }
+    })
+  </script>
+</body>
+
+</html>

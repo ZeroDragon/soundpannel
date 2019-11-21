@@ -1,108 +1,59 @@
-const request = require('request')
+var WebSocketClient = require('websocket').client
 const { EventEmitter } = require('events')
 
 class YouTube extends EventEmitter {
-  constructor({ youtubeChannel, youtubeKey }) {
+  constructor({ restreamToken }) {
     super()
-    this.id = youtubeChannel
-    this.key = youtubeKey
-    this.lastRead = 0
+    this.token = restreamToken
     this.getLive()
   }
 
   getLive() {
-    if (this.key == null || this.key === '') return
-    if (this.id == null || this.id === '') return
-
-    const url = 'https://www.googleapis.com/youtube/v3/search' +
-      '?eventType=live' +
-      '&part=id' +
-      `&channelId=${this.id}` +
-      '&type=video' +
-      `&key=${this.key}`
-    this.request(url, data => {
-      if (!data.items[0]) {
-        setTimeout(() => {
-          console.log('Live not found, cooldown for 10s')
-          this.getLive()
-        }, 10000)
-      } else {
-        this.liveId = data.items[0].id.videoId
-        this.getChatId()
-      }
+    if (this.token == null || this.token === '') return
+    var client = new WebSocketClient()
+    client.on('Restream: connectFailed', function (error) {
+      console.error('Connect Error: ' + error.toString())
     })
-  }
 
-  getChatId() {
-    if (!this.liveId) return this.emit('error', 'Live id is invalid.')
-    const url = 'https://www.googleapis.com/youtube/v3/videos' +
-      '?part=liveStreamingDetails' +
-      `&id=${this.liveId}` +
-      `&key=${this.key}`
-    this.request(url, data => {
-      if (!data.items.length) {
-        console.log('Chat id not found, cooldown for 10s')
-        setTimeout(() => {
-          this.getLive()
-        }, 10000)
-      } else {
-        this.chatId = data.items[0].liveStreamingDetails.activeLiveChatId
-        this.listen(5000)
-      }
-    })
-  }
-
-  getChat() {
-    if (!this.chatId) return this.emit('error', 'Chat id is invalid.')
-    const url = 'https://www.googleapis.com/youtube/v3/liveChat/messages' +
-      `?liveChatId=${this.chatId}` +
-      '&part=id,snippet,authorDetails' +
-      '&maxResults=2000' +
-      `&key=${this.key}`
-    this.request(url, data => {
-      data.items.forEach(item => {
-        let time = new Date(item.snippet.publishedAt).getTime()
-        if (this.lastRead < time) {
-          this.lastRead = time
-
-          const message = {
-            key: `youtube-${item.id}`,
-            value: {
-              timestamp: new Date(item.publishedAt),
-              author: item.authorDetails.displayName,
-              source: 'youtube',
-              message: item.snippet.displayMessage
+    client.on('connect', connection => {
+      connection.on('error', function (error) {
+        console.error("Restream: Connection Error: " + error.toString())
+      })
+      connection.on('close', function () {
+        console.log('Restream: echo-protocol Connection Closed')
+      })
+      connection.on('message', payload => {
+        if (payload.type === 'utf8') {
+          const parsed = JSON.parse(payload.utf8Data)
+          if (parsed.event === 'message') {
+            const msg = parsed.data
+            const message = {
+              key: `youtube-${msg.timestamp}`,
+              value: {
+                timestamp: new Date(msg.timestamp),
+                author: msg.author,
+                source: 'youtube',
+                message: msg.contents
+                  .filter(i => i.type === 'text')
+                  .map(i => i.content)
+                  .join(' ')
+              }
             }
+            this.emit('message', message)
           }
-
-          this.emit('message', message)
         }
       })
     })
-  }
 
-  request(url, callback) {
-    request({
-      url: url,
-      method: 'GET',
-      json: true,
-    }, (error, response, data) => {
-      if (error) console.error(error)
-      else if (response.statusCode !== 200) console.error(data)
-      else callback(data)
-    })
-  }
-
-  listen(delay) {
-    this.getChat()
-    this.interval = setTimeout(() => {
-      this.stop()
-      this.listen(delay)
-    }, delay)
-  }
-
-  stop() {
-    clearTimeout(this.interval)
+    client.connect(
+      `wss://webchat-backend.restream.io/ws?tokenId=${this.token}`,
+      null,
+      {
+        headers: {
+          'Sec-WebSocket-Protocol': 'echo-protocol'
+        }
+      }
+    )
   }
 
 }
