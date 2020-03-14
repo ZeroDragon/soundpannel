@@ -19,7 +19,7 @@
     "url": "https://github.com/ZeroDragon/soundpannel.git"
   },
   "devDependencies": {
-    "acorn": "^6.1.1",
+    "acorn": "^6.4.1",
     "css-loader": "^2.1.0",
     "electron": "^4.0.6",
     "electron-installer-dmg": "^2.0.0",
